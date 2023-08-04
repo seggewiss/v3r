@@ -26,7 +26,7 @@ func findTemplatesUsingComponent(root, ext, componentName string) []string {
 		}
 
 		fileContent := string(b)
-		if !strings.Contains(fileContent, componentName) {
+		if !strings.Contains(fileContent, "<"+componentName) {
 			return nil
 		}
 
