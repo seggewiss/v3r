@@ -57,6 +57,7 @@ func main() {
 	fmt.Println("Vue3 template refactoring \"" + componentName + "\" with model \"" + modelName + "\" and event \"" + eventName + "\"")
 	fmt.Println("")
 
+	var unprocessedFiles []string
 	for _, file := range files {
 		fmt.Printf("Processing %s ...\n", filepath.Base(file))
 		b, err := os.ReadFile(file)
@@ -66,16 +67,29 @@ func main() {
 
 		fileContent := string(b)
 		// https://regex101.com/r/Q3VTcx/1
-		modelRegex := regexp.MustCompile(`(<` + componentName + `\n( *)[a-zA-Z0-9.\-:_$(')@!=>"{%}\[\]? \n]*)v-model="(.*)"`)
+		modelRegex := regexp.MustCompile(`(<` + componentName + `\n( *)[a-zA-Z0-9.\-+*#:_$(')@!=>"{%}\[\]? \n|/` + "`" + `&]*)v-model="(.*)"`)
 		modelFixed := modelRegex.ReplaceAllString(fileContent, "${1}{% if VUE3 %}\n${2}v-model:"+modelName+"=\"$3\"\n$2{% else %}\n${2}v-model=\"${3}\"\n${2}{% endif %}")
 
 		// https://regex101.com/r/VkXBIA/1
-		eventRegex := regexp.MustCompile(`(<` + componentName + `\n( *)[a-zA-Z0-9.\-:_$(')@!=>"{%}\[\]? \n]*)@` + eventName + `="(.*)"`)
+		eventRegex := regexp.MustCompile(`(<` + componentName + `\n( *)[a-zA-Z0-9.\-+*#:_$(')@!=>"{%}\[\]? \n|/` + "`" + `&]*)@` + eventName + `="(.*)"`)
 		eventFixed := eventRegex.ReplaceAllString(modelFixed, "${1}{% if VUE3 %}\n${2}@update:"+modelName+"=\"${3}\"\n${2}{% else %}\n${2}@"+eventName+"=\"${3}\"\n${2}{% endif %}")
+
+		if fileContent == eventFixed {
+			unprocessedFiles = append(unprocessedFiles, file)
+			continue
+		}
 
 		err = os.WriteFile(file, []byte(eventFixed), 0644)
 		if err != nil {
 			panic(err)
+		}
+	}
+
+	if len(unprocessedFiles) > 0 {
+		fmt.Println("")
+		fmt.Println("These files contained the component but where unable to convert:")
+		for _, file := range unprocessedFiles {
+			fmt.Println(filepath.Base(file))
 		}
 	}
 
