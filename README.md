@@ -1,3 +1,8 @@
+# Warning
+
+This program will change all files with the specified extension. This software is best used with a GIT repository.
+Make sure you don't have any uncomitted and pushed changes. Then and only then run the software.
+
 # About this project
 This tool will refactor component usages in templates according to Vue 3.
 If your component uses `model` to define different props as the default model and change events, this is no longer supported with Vue 3.
@@ -55,20 +60,24 @@ If we combine the event listeners with v-models this would trigger some eslint r
 # Usage
 It's recommended that you add the released binary for your os to your `$PATH`.
 
-## Arguments
+## Flags
 
-The binary needs at least 3 arguments.
+| Flag       | Type    | Default value       | Description                                                                           |
+| ---------- | ------- | ------------------- | ------------------------------------------------------------------------------------- |
+| -auto      | boolean | false               | Automatically fix all base components. Overrides `-component`, `-model` and `-event`! |
+| -component | string  | ""                  | The component you want to fix up cross file                                           |
+| -model     | string  | "value"             | The model used by the component                                                       |
+| -event     | string  | "input"             | The event name used to update the model                                               |
+| -directory | string  | Current working dir | The directory being searched                                                          |
+| -extension | string  | ".twig"             | The extension of files being searched for components                                  |
+| -help      | boolean | false               | Displays the above list excluding -help                                               |
 
-1. The component name without the leading carret e.g. `sw-entity-single-select`
-2. The model prop name e.g. `value`
-3. The previously emitted even name e.g. `change`
-4. Optional: Specify the working directory, where the binary searches for `.twig` files
-
-If the fourth parameter is left out the current working dir is taken instead.
+### Examples
 
 ```shell
 $ cd <shopwareRoot>/src/Administration/Resources/app/administration
-$ v3r sw-component-name-without modelName eventName
+$ v3r -component=sw-component-name-without -model=modelName -event=eventName
+$ v3r -auto
 ```
 
 ## Check the results
