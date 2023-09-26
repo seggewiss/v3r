@@ -190,6 +190,6 @@ func GetAutoFixableComponents() []Component {
 			Name:  "sw-inherit-wrapper",
 			Model: "value",
 			Event: "input",
-		}
+		},
 	}
 }
